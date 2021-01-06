@@ -8,14 +8,15 @@ module.exports = function (app) {
 
   app.route('/api/check')
     .post((req, res) => {
+
       return res.json(solver.check(req.body.puzzle, req.body.coordinate, req.body.value))
+
     });
     
   app.route('/api/solve')
     .post((req, res) => {
-      var puzStr = req.body.puzzle
 
-      //res.json(solver.validate(req.body.puzzle))
+      return res.json(solver.solve(req.body.puzzle))
 
     });
 };

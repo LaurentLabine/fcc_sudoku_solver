@@ -1,3 +1,5 @@
+const { puzzlesAndSolutions } = require("./puzzle-strings");
+
 class SudokuSolver {  
   constructor() {  // Constructor
     this.status = {"conflict" : []};  // Class body
@@ -16,7 +18,6 @@ class SudokuSolver {
   }
 
   check(puzStr, coordinate, value) {
-
       var row, col
       var res = {}
       this.status = {}
@@ -42,6 +43,8 @@ class SudokuSolver {
 
       //if every input is valid, we start looking into placement
 
+      //console.log("puz : " + puzStr + " row : " + row + " col : " + col + " value : " + value)
+
       this.checkColPlacement(puzStr,row,col,value)
 
       this.checkRowPlacement(puzStr,row,col,value)
@@ -52,7 +55,7 @@ class SudokuSolver {
         this.status.valid = false
       else
         this.status = {valid:true}
-        
+
       return this.status
   }
 
@@ -124,8 +127,115 @@ class SudokuSolver {
         return
   }
 
+  getKeyByValue(value) {
+    return Object.keys(this.convert).find(key => this.convert[key] === value);
+  }
+
   solve(puzzleString) {
+
+    this.status = {}
+    var possible = []//Array of array holding possibilities
+    var puzzleArr = []//Array version of the array's string to allow
+    var ind = 0
+    var coordinate
+    var foundOne
+    var count = 0;
+    var val = ""
+
+    if (!(puzzleString !== undefined))
+        return {error : "Required field missing" }
+
+    this.validate(puzzleString)
+
+    if(this.status.error)//If validation flags errors, we stop the check here and return the error.  Otherwise we keep going
+      return this.status
+
+    //for A1 to I9 check all the valuesfrom 0 to 9 and keep in a possibleMatch array every ones that doesnt return an error when checked
+
+    //Foreach values in the array, test numbers from 0 to 9 and save in an potential candidates array the possible ones.
+
+
+
+
+    //Validating that puzzle entered is valid
+    for(var i = 0; i < 9 ; i++){//9 rows
+      for(var j = 0; j < 9; j++){//9 Columns
+        ind = j+1
+        coordinate = this.getKeyByValue(i) + ind
+         val = puzzleString.substr(count,1)
+        //  console.log(count)
+  
+        if(val !== "."){
+          if(!this.check(puzzleString.slice(0,count) + "." + puzzleString.slice(count+1),coordinate,val).valid)
+            return { error: 'Puzzle cannot be solved' }
+        }
+        count++
+      }
+    }
+
+    console.log("Puzzle solvable!")
+    console.log(puzzleString)
+    count = 0;
     
+    //Creating an array of 9x9x9 in order to store the prospects for each square.
+    for(var i = 0; i< 9; i++){
+       possible[i] = new Array(9) 
+       puzzleArr[i] = new Array(9)
+    }
+
+    //copying the string to an array
+    for(var i = 0; i< 9; i++){
+      for(var j = 0; j< 9; j++ ){
+      puzzleArr[i][j] = puzzleString.substr(count,1)
+      count++
+      }
+   }
+
+    count = 0;
+
+do{
+  foundOne = 0
+
+  //every iteration of the puzzle we reset possible results to re evaluate
+  for(var i = 0; i< 9; i++){
+    for(var j = 0; j< 9; j++ ){
+    possible[i][j] = new Array
+    count++
+      }
+  }
+
+  for(var i = 0; i < 9 ; i++){//9 rows
+    for(var j = 0; j < 9; j++){//9 Columns
+      ind = j+1
+      coordinate = this.getKeyByValue(i) + ind
+
+      for(var k = 1; k < 10; k++)            
+        if(this.check(puzzleString,coordinate,k.toString()).valid)//the rest of my logic is based on the puzzle as a string so converting the number to a string for comparison.
+          possible[i][j].push(k)
+
+      if(possible[i][j].length == 1){
+        puzzleArr[i][j] = possible[i][j][0]//1 because 0 is coordinate
+        foundOne = true
+      }
+    }
+  }
+
+  puzzleString = ""
+
+  //Replace the String with the Array resulting the pass as the rest of the treatment relies on the string format
+  for(var i = 0; i< 9; i++)
+    for(var j = 0; j< 9; j++ )
+        puzzleString += puzzleArr[i][j]
+
+  console.log(puzzleString)//Printing result after each iteration
+
+  }while(foundOne)
+
+  if(puzzleString.indexOf(".") !== -1)//Solution wasnt found
+    return { error: 'Puzzle cannot be solved' }
+  else
+    return { solution : puzzleString}
+
   }
 }
 
