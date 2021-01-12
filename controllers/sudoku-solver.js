@@ -60,7 +60,7 @@ class SudokuSolver {
     var row = puzzleString.slice(startIndex, startIndex + 9)
 
     if (row.indexOf(value) > -1)
-      this.status.conflict.push("row")
+     return this.status.conflict.push("row")
   }
 
   checkColPlacement(puzzleString, row, column, value) {
@@ -71,7 +71,7 @@ class SudokuSolver {
       col+=puzzleString.substr(i-1,1)
     
     if (col.indexOf(value) > -1)
-      this.status.conflict.push("column")
+     return this.status.conflict.push("column")
   }
 
   checkRegionPlacement(puzzleString, row, column, value) {
@@ -151,7 +151,6 @@ class SudokuSolver {
         ind = j+1
         coordinate = this.getKeyByValue(i) + ind
          val = puzzleString.substr(count,1)
-        //  console.log(count)
   
         if(val !== "."){
           if(!this.check(puzzleString.slice(0,count) + "." + puzzleString.slice(count+1),coordinate,val).valid)
@@ -194,7 +193,6 @@ class SudokuSolver {
             }
         }
       }
-      console.log(puzzleString)//Printing result after each iteration
     }
   return { solution : puzzleString}
   }
